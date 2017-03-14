@@ -1,19 +1,17 @@
-var superagent = require('superagent')  // Used to make HTTP requests 
-var expect = require('expect.js')       // Used for BDD-style assertions 
-var app = require('./app.js')           // server application code
+var superagent = require('superagent')
+var expect = require('expect.js')
+var app = require('./app.js')
 let baseUrl = 'http://localhost:3007/api'
-
-before(function(){
-  app.listen(3007)    // Prepare for the tests (optional)
+before(function(done){
+  app.listen(3007, done)
 })
 describe('express rest api server', function(){
-  var id // ID shared between multiple it statements
+  var id
 
   it('posts an object', function(done){
-    // Create a new post
-    superagent.post('${baseUrl}/posts')
+    superagent.post(`${baseUrl}/posts`)
       .send({ author: 'John',
-        text: `There's a better alternative to the ubiquitous JSON as the communication protocol of the web. It's Protocol Buffers (protobuf). In a nutshell, protobuf offers a more dense format (faster processing) and provides data schemas (enforcement of structure and better compatibility with old code). `
+        text: 'The Warriors Blew a 3-1 Lead'
       })
       .end(function(e, res){
         // console.log(res.body)
@@ -26,8 +24,7 @@ describe('express rest api server', function(){
   })
 
   it('retrieves an object', function(done){
-    // Fetch the post
-    superagent.get('${baseUrl}/posts/' + id)
+    superagent.get(`${baseUrl}/posts/`+id)
       .end(function(e, res){
         // console.log(res.body)
         expect(e).to.eql(null)
@@ -39,10 +36,8 @@ describe('express rest api server', function(){
       })
   })
 
-  
   it('retrieves a collection', function(done){
-    // Fetch the list of posts
-    superagent.get('${baseUrl}/posts')
+    superagent.get(`${baseUrl}/posts`)
       .end(function(e, res){
         // console.log(res.body)
         expect(e).to.eql(null)
@@ -50,12 +45,10 @@ describe('express rest api server', function(){
         expect(res.body.map(function (item){return item.id})).to.contain(id)
         done()
       })
-
   })
 
   it('updates an object', function(done){
-    // Update the post
-    superagent.put('${baseUrl}/posts/' + id)
+    superagent.put(`${baseUrl}/posts/`+id)
       .send({author: 'Peter', id: id})
       .end(function(e, res){
         // console.log(res.body)
@@ -64,12 +57,10 @@ describe('express rest api server', function(){
         expect(res.body.msg).to.eql('success')
         done()
       })
-
   })
 
   it('checks an updated object', function(done){
-    // Check that the updated post has new values
-    superagent.get('${baseUrl}/posts/' + id)
+    superagent.get(`${baseUrl}/posts/`+id)
       .end(function(e, res){
         // console.log(res.body)
         expect(e).to.eql(null)
@@ -78,12 +69,9 @@ describe('express rest api server', function(){
         expect(res.body.author).to.eql('Peter')
         done()
       })
-
   })
-
   it('removes an object', function(done){
-    // Remove the post
-    superagent.del('${baseUrl}/posts/' +id)
+    superagent.del(`${baseUrl}/posts/`+id)
       .end(function(e, res){
         // console.log(res.body)
         expect(e).to.eql(null)
@@ -91,12 +79,9 @@ describe('express rest api server', function(){
         expect(res.body.msg).to.eql('success')
         done()
       })
-
   })
-
   it('checks an removed object', function(done){
-    // Check that the post is no longer present
-    superagent.get('${baseUrl}/posts/')
+    superagent.get(`${baseUrl}/posts/`)
       .end(function(e, res){
         // console.log(res.body)
         expect(e).to.eql(null)
@@ -104,9 +89,7 @@ describe('express rest api server', function(){
         done()
       })
   })
-
 })
-
 after(function(){
   process.exit()
 })
